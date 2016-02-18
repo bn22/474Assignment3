@@ -2,3 +2,21 @@
 	width: 800px;
 	height: 600px;
 }
+
+#auto {
+	position: absolute;
+	bottom: 10%;
+	left: 20%;
+}
+
+#bike {
+	position: absolute;
+	bottom: 10%;
+	left: 30%;
+}
+
+#other {
+	position: absolute;
+	bottom: 10%;
+	left: 40%;
+}
