@@ -5,6 +5,7 @@ mapLink =
 L.tileLayer(
     'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 14,
+    //minZoom, 10,
     id: 'vipermk2.p5pi633n',
     accessToken: 'pk.eyJ1IjoidmlwZXJtazIiLCJhIjoiY2lrcDMzMGNxMHpxMHZ0a21lemVwODcxZyJ9.LseNs-vCbU8I8IVOxja5wA'
     }).addTo(map);
