@@ -28,7 +28,7 @@ var format = d3.time.format("%x %H:%M");
 var formatDate = d3.time.format("%m");
 
 //Keeps track of the currently selected months and terms
-var currentMonth = "5";
+var currentMonth = null;
 var currentTerm = null;
 
 function filterByCategoryMonth(filteredMonth, filteredSection) {
