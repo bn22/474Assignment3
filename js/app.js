@@ -1,5 +1,5 @@
 //Initalizes the map which is centered on the University of Washington campus
-var map = L.map('map').setView([47.6550, -122.3080], 13);
+var map = L.map('map').setView([47.6550, -122.3080], 11);
 mapLink = 
     '<a href="http://openstreetmap.org">OpenStreetMap</a>';
 L.tileLayer(
@@ -25,13 +25,13 @@ var g = svg.append("g");
 
 //Formats the time given in the json into a month so it can be filtered
 var format = d3.time.format("%x %H:%M");
-var formatDate = d3.time.format("%B");
+var formatDate = d3.time.format("%m");
 
 //Keeps track of the currently selected months and terms
-var currentMonth;
-var currentTerm;
+var currentMonth = "5";
+var currentTerm = null;
 
-function filterByCategoryMonth(term, month) {
+function filterByCategoryMonth(filteredMonth, filteredSection) {
 	//Empties the previous map created by the user
 	svg.selectAll("*").remove();
 	svg = d3.select("#map").select("svg");
@@ -44,10 +44,6 @@ function filterByCategoryMonth(term, month) {
 			d.LatLng = new L.LatLng(d.Latitude, d.Longitude);
 		})
 
-		//Looks at the user's input
-		var filteredSection = term;
-		var filteredMonth = month;
-
 		//Splits the path based on the user's input
 		if (filteredMonth == null && filteredSection == null) {
 			var feature = g.selectAll("circle")
@@ -55,9 +51,9 @@ function filterByCategoryMonth(term, month) {
 				.enter()
 				.append("circle")
 				.style("stroke", "black")  
-				.style("opacity", 0.8) 
+				.style("opacity", 0.6) 
 				.style("fill", "red")
-				.attr("r", 2);  
+				.attr("r", 3);  
 		} else if (filteredSection != null && filteredMonth == null) {
 			var feature = g.selectAll("circle")
 				.data(collection)
@@ -67,18 +63,19 @@ function filterByCategoryMonth(term, month) {
 					return d["Event Clearance Group"] == filteredSection  
 				})
 				.style("stroke", "black")  
-				.style("opacity", 0.8) 
+				.style("opacity", 0.6) 
 				.style("fill", function(d) {
 					if (d["Event Clearance Group"] == "AUTO THEFTS") {
-						return "red"
-					} else if (d["Event Clearance Group"] == "BIKE") {
 						return "orange"
+					} else if (d["Event Clearance Group"] == "BIKE") {
+						return "red"
 					} else if (d["Event Clearance Group"] == "OTHER PROPERTY") {
 						return "blue"
 					}
 				})
-				.attr("r", 2);  
-		} else if (filteredSection == null && filteredMonth != null) {
+				.attr("r", 3);  
+		} else if (currentTerm == null && filteredMonth != null) {
+            
 			var feature = g.selectAll("circle")
 				.data(collection)
 				.enter()
@@ -87,32 +84,42 @@ function filterByCategoryMonth(term, month) {
 					return formatDate(format.parse(d["Event Clearance Date"])) == filteredMonth 
 				})
 				.style("stroke", "black")  
-				.style("opacity", 0.8) 
+				.style("opacity", 0.6) 
 				.style("fill", function(d) {
 					if (d["Event Clearance Group"] == "AUTO THEFTS") {
-						return "red";
-					} else if (d["Event Clearance Group"] == "BIKE") {
 						return "orange";
+					} else if (d["Event Clearance Group"] == "BIKE") {
+						return "red";
 					} else if (d["Event Clearance Group"] == "OTHER PROPERTY") {
 						return "blue";
 					}
 				})
-				.attr("r", 2);  
+				.attr("r", 3);
 		} else {
+            
 			var feature = g.selectAll("circle")
 				.data(collection)
 				.enter()
 				.append("circle")
 				.filter(function(d) { 
-					return d["Event Clearance Group"] == filteredSection 
+					return d["Event Clearance Group"] == currentTerm 
 				})
 				.filter(function(d) { 
 					return formatDate(format.parse(d["Event Clearance Date"])) == filteredMonth 
 				})
 				.style("stroke", "black")  
-				.style("opacity", 0.8) 
-				.style("fill", "red")
-				.attr("r", 2);  
+				.style("opacity", 0.6) 
+                .style("fill", function(d) {
+                    
+					if (d["Event Clearance Group"] == "AUTO THEFTS") {
+						return "orange";
+					} else if (d["Event Clearance Group"] == "BIKE") {
+						return "red";
+					} else if (d["Event Clearance Group"] == "OTHER PROPERTY") {
+                        return "blue";
+					}
+				})
+				.attr("r", 3); 
 		}
 
 		//Resets the view whenever the user interacts with the map through zooming or panning
@@ -126,26 +133,41 @@ function filterByCategoryMonth(term, month) {
 					map.latLngToLayerPoint(d.LatLng).y +")";
 				}
 			)
+            $('#month').html(currentMonth);
+            $('#numberOfRecord').html(feature[0].length);
 		}
 	})	
 }
 
-filterByCategoryMonth(null, null);
+
+	filterByCategoryMonth(currentMonth, currentTerm);
+
 
 $('#auto').click(function() {
-	filterByCategoryMonth("AUTO THEFTS", "September");
+    currentTerm = "AUTO THEFTS";
+	filterByCategoryMonth(currentMonth, currentTerm);
 });
 
 $("#bike").click(function() {
-	filterByCategoryMonth("BIKE", "December");
+    currentTerm = "BIKE";
+		filterByCategoryMonth(currentMonth, currentTerm);
+
 });
 
 $('#other').click(function() {
-	filterByCategoryMonth("OTHER PROPERTY", "May");
+    currentTerm = "OTHER PROPERTY";
+		filterByCategoryMonth(currentMonth, currentTerm);
+
 });
 
-$("#ex13").slider({
-    ticks: [1,2,3,4,5,6,7,8,9,10,11,12],
+$("#monthSilder").slider().on('change',function(){
+    currentMonth = $("#monthSilder").slider('getValue');
+    	filterByCategoryMonth(currentMonth, currentTerm);
+
+});
+
+$("#monthSilder").slider({
+    ticks: [01,02,03,04,05,06,07,08,09,10,11,12],
     ticks_labels: ["Jan", "Feb", "Mar", "Apr", "May" , "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    ticks_snap_bounds: 30
+    ticks_snap_bounds: 1
 });
