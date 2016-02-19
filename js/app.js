@@ -51,8 +51,16 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 				.enter()
 				.append("circle")
 				.style("stroke", "black")  
-				.style("opacity", 0.6) 
-				.style("fill", "red")
+				.style("opacity", 0.9) 
+				.style("fill", function(d) {
+					if (d["Event Clearance Group"] == "AUTO THEFTS") {
+						return "orange"
+					} else if (d["Event Clearance Group"] == "BIKE") {
+						return "red"
+					} else if (d["Event Clearance Group"] == "OTHER PROPERTY") {
+						return "blue"
+					}
+				})
 				.attr("r", 3);  
 		} else if (filteredSection != null && filteredMonth == null) {
 			var feature = g.selectAll("circle")
@@ -63,7 +71,7 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 					return d["Event Clearance Group"] == filteredSection  
 				})
 				.style("stroke", "black")  
-				.style("opacity", 0.6) 
+				.style("opacity", 0.9) 
 				.style("fill", function(d) {
 					if (d["Event Clearance Group"] == "AUTO THEFTS") {
 						return "orange"
@@ -84,7 +92,7 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 					return formatDate(format.parse(d["Event Clearance Date"])) == filteredMonth 
 				})
 				.style("stroke", "black")  
-				.style("opacity", 0.6) 
+				.style("opacity", 0.9) 
 				.style("fill", function(d) {
 					if (d["Event Clearance Group"] == "AUTO THEFTS") {
 						return "orange";
@@ -108,7 +116,7 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 					return formatDate(format.parse(d["Event Clearance Date"])) == filteredMonth 
 				})
 				.style("stroke", "black")  
-				.style("opacity", 0.6) 
+				.style("opacity", 0.9) 
                 .style("fill", function(d) {
                     
 					if (d["Event Clearance Group"] == "AUTO THEFTS") {
@@ -133,14 +141,19 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 					map.latLngToLayerPoint(d.LatLng).y +")";
 				}
 			)
-            $('#month').html(currentMonth);
+			console.log(feature);
+			console.log(filteredMonth);
+			if (currentMonth == null) {
+				$('#month').html("All of");
+			} else {
+				$('#month').html(currentMonth + "/");
+			}
             $('#numberOfRecord').html(feature[0].length);
 		}
 	})	
 }
 
-
-	filterByCategoryMonth(currentMonth, currentTerm);
+filterByCategoryMonth(currentMonth, currentTerm);
 
 
 $('#auto').click(function() {
@@ -162,12 +175,17 @@ $('#other').click(function() {
 
 $("#monthSilder").slider().on('change',function(){
     currentMonth = $("#monthSilder").slider('getValue');
-    	filterByCategoryMonth(currentMonth, currentTerm);
+	if (currentMonth == 13) {
+		currentMonth = null;
+	}
+	filterByCategoryMonth(currentMonth, currentTerm);
 
 });
 
 $("#monthSilder").slider({
-    ticks: [01,02,03,04,05,06,07,08,09,10,11,12],
-    ticks_labels: ["Jan", "Feb", "Mar", "Apr", "May" , "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    ticks: [01,02,03,04,05,06,07,08,09,10,11,12, 13],
+    ticks_labels: ["Jan", "Feb", "Mar", "Apr", "May" , "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "All"],
     ticks_snap_bounds: 1
 });
+
+$("#monthSilder").slider("setValue", 13);
