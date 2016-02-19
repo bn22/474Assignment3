@@ -23,6 +23,9 @@ map._initPathRoot()
 //Tells d3 to use the Map div created from Leaflet
 var svg = d3.select("#map").select("svg");
 var g = svg.append("g");
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
 
 //Formats the time given in the json into a month so it can be filtered
 var format = d3.time.format("%x %H:%M");
@@ -31,6 +34,9 @@ var formatDate = d3.time.format("%m");
 //Keeps track of the currently selected months and terms
 var currentMonth = null;
 var currentTerm = null;
+var feature = null;
+var collection = null;
+var isCollectionNull = true;
 
 function filterByCategoryMonth(filteredMonth, filteredSection) {
 	//Empties the previous map created by the user
@@ -43,11 +49,15 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 		collection.forEach(function(d) {
 			d.month = formatDate(format.parse(d["Event Clearance Date"]));
 			d.LatLng = new L.LatLng(d.Latitude, d.Longitude);
-		})
-
-		//Splits the path based on the user's input
+		});
+         isCollectionNull == false;
+        applyFilters(collection,filteredMonth,filteredSection);
+    });
+}
+function applyFilters(collection,filteredMonth,filteredSection){
+    //Splits the path based on the user's input
 		if (filteredMonth == null && filteredSection == null) {
-			var feature = g.selectAll("circle")
+			 feature = g.selectAll("circle")
 				.data(collection)
 				.enter()
 				.append("circle")
@@ -62,9 +72,22 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 						return "blue"
 					}
 				})
-				.attr("r", 3);  
+				.attr("r", 3)
+                          .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html(d["Event Clearance Date"] + "<br/>"  + d["Hundred Block Location"])  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });  
 		} else if (filteredSection != null && filteredMonth == null) {
-			var feature = g.selectAll("circle")
+			 feature = g.selectAll("circle")
 				.data(collection)
 				.enter()
 				.append("circle")
@@ -82,10 +105,23 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 						return "blue"
 					}
 				})
-				.attr("r", 3);  
+				.attr("r", 3)             
+                .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html(d["Event Clearance Date"] + "<br/>"  + d["Hundred Block Location"])  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });  
 		} else if (currentTerm == null && filteredMonth != null) {
             
-			var feature = g.selectAll("circle")
+			 feature = g.selectAll("circle")
 				.data(collection)
 				.enter()
 				.append("circle")
@@ -103,10 +139,22 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 						return "blue";
 					}
 				})
-				.attr("r", 3);
+				.attr("r", 3)
+                          .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html(d["Event Clearance Date"] + "<br/>"  + d["Hundred Block Location"])  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
 		} else {
-            
-			var feature = g.selectAll("circle")
+			 feature = g.selectAll("circle")
 				.data(collection)
 				.enter()
 				.append("circle")
@@ -119,7 +167,6 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 				.style("stroke", "black")  
 				.style("opacity", 0.9) 
                 .style("fill", function(d) {
-                    
 					if (d["Event Clearance Group"] == "AUTO THEFTS") {
 						return "orange";
 					} else if (d["Event Clearance Group"] == "BIKE") {
@@ -128,22 +175,39 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
                         return "blue";
 					}
 				})
-				.attr("r", 3); 
+				.attr("r", 3)
+             .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html(d["Event Clearance Date"] + "<br/>"  + d["Hundred Block Location"])  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        }); 
 		}
 
 		//Resets the view whenever the user interacts with the map through zooming or panning
 		map.on("viewreset", update);
 		update();
 
-		function update() {
+
+		
+}
+
+function update() {
+            console.log(feature);
 			feature.attr("transform", function(d) { 
 				return "translate("+ 
 					map.latLngToLayerPoint(d.LatLng).x +","+ 
 					map.latLngToLayerPoint(d.LatLng).y +")";
 				}
 			)
-			console.log(feature);
-			console.log(filteredMonth);
+
 			if (currentMonth == null) {
 				$('#month').html("All of");
 			} else {
@@ -151,25 +215,45 @@ function filterByCategoryMonth(filteredMonth, filteredSection) {
 			}
             $('#numberOfRecord').html(feature[0].length);
 		}
-	})	
-}
 
 filterByCategoryMonth(currentMonth, currentTerm);
 
+//function filtering(){
+//  feature[0].forEach(function(d){
+//      //console.log(d);
+//      if(d.__data__["Event Clearance Group"]=="OTHER PROPERTY"){
+//
+//
+//      }else{
+//          d3.select(d).style("opacity", 0)
+//      }
+//  })  
+//};
 
 $('#auto').click(function() {
     currentTerm = "AUTO THEFTS";
+    //filtering();
 	filterByCategoryMonth(currentMonth, currentTerm);
 });
 
 $("#bike").click(function() {
     currentTerm = "BIKE";
+        //filtering();
+
 		filterByCategoryMonth(currentMonth, currentTerm);
 
 });
 
 $('#other').click(function() {
+       // filtering();
+
     currentTerm = "OTHER PROPERTY";
+		filterByCategoryMonth(currentMonth, currentTerm);
+
+});
+
+$('#all').click(function() {
+    currentTerm = null;
 		filterByCategoryMonth(currentMonth, currentTerm);
 
 });
