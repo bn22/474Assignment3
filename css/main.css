@@ -1,22 +1,17 @@
 #map {
-	width: 800px;
-	height: 600px;
+	height: 500px;
 }
 
-#auto {
-	position: absolute;
-	bottom: 10%;
-	left: 20%;
+body{
+    font-family: 'Open Sans', sans-serif;
 }
 
-#bike {
-	position: absolute;
-	bottom: 10%;
-	left: 30%;
+.slider.slider-horizontal {
+    margin: 20px;   
+    width: 500px;
+    height: 20px;
 }
 
-#other {
-	position: absolute;
-	bottom: 10%;
-	left: 40%;
+.slider{
+     
 }
