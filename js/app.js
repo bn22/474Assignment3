@@ -36,25 +36,28 @@ var currentMonth = null;
 var currentTerm = null;
 var feature = null;
 var collection = null;
-var isCollectionNull = true;
+var isFirst = true;
+
+
 
 function filterByCategoryMonth(filteredMonth, filteredSection) {
 	//Empties the previous map created by the user
 	svg.selectAll("*").remove();
 	svg = d3.select("#map").select("svg");
 	g = svg.append("g");
-
-	//Tells d3 to look through the provided json file
-	d3.json("SPD.json", function(collection) {
-		collection.forEach(function(d) {
-			d.month = formatDate(format.parse(d["Event Clearance Date"]));
-			d.LatLng = new L.LatLng(d.Latitude, d.Longitude);
-		});
-         isCollectionNull == false;
-        applyFilters(collection,filteredMonth,filteredSection);
+    collection = d3.json("SPD.json", function(collection) {
+        collection.forEach(function(d) {
+            d.month = formatDate(format.parse(d["Event Clearance Date"]));
+            d.LatLng = new L.LatLng(d.Latitude, d.Longitude);
+        });
+        
+    applyFilters(collection,filteredMonth,filteredSection);
     });
+    console.log(collection.row);
 }
+
 function applyFilters(collection,filteredMonth,filteredSection){
+if(collection!= null){
     //Splits the path based on the user's input
 		if (filteredMonth == null && filteredSection == null) {
 			 feature = g.selectAll("circle")
@@ -73,7 +76,8 @@ function applyFilters(collection,filteredMonth,filteredSection){
 					}
 				})
 				.attr("r", 3)
-                          .on("mouseover", function(d) {      
+                .on("mouseover", function(d) {  
+                 d3.select(this).transition().duration(100).attr("r", 10)
             div.transition()        
                 .duration(200)      
                 .style("opacity", .9);      
@@ -81,7 +85,8 @@ function applyFilters(collection,filteredMonth,filteredSection){
                 .style("left", (d3.event.pageX) + "px")     
                 .style("top", (d3.event.pageY - 28) + "px");    
             })                  
-        .on("mouseout", function(d) {       
+        .on("mouseout", function(d) {  
+                 d3.select(this).transition().duration(100).attr("r", 3)
             div.transition()        
                 .duration(500)      
                 .style("opacity", 0);   
@@ -106,7 +111,8 @@ function applyFilters(collection,filteredMonth,filteredSection){
 					}
 				})
 				.attr("r", 3)             
-                .on("mouseover", function(d) {      
+                .on("mouseover", function(d) {   
+                 d3.select(this).transition().duration(100).attr("r", 10)
             div.transition()        
                 .duration(200)      
                 .style("opacity", .9);      
@@ -114,7 +120,8 @@ function applyFilters(collection,filteredMonth,filteredSection){
                 .style("left", (d3.event.pageX) + "px")     
                 .style("top", (d3.event.pageY - 28) + "px");    
             })                  
-        .on("mouseout", function(d) {       
+        .on("mouseout", function(d) {   
+                 d3.select(this).transition().duration(100).attr("r", 3)
             div.transition()        
                 .duration(500)      
                 .style("opacity", 0);   
@@ -140,7 +147,8 @@ function applyFilters(collection,filteredMonth,filteredSection){
 					}
 				})
 				.attr("r", 3)
-                          .on("mouseover", function(d) {      
+                          .on("mouseover", function(d) {     
+                 d3.select(this).transition().duration(100).attr("r", 10)
             div.transition()        
                 .duration(200)      
                 .style("opacity", .9);      
@@ -148,7 +156,8 @@ function applyFilters(collection,filteredMonth,filteredSection){
                 .style("left", (d3.event.pageX) + "px")     
                 .style("top", (d3.event.pageY - 28) + "px");    
             })                  
-        .on("mouseout", function(d) {       
+        .on("mouseout", function(d) {     
+                 d3.select(this).transition().duration(100).attr("r", 3)
             div.transition()        
                 .duration(500)      
                 .style("opacity", 0);   
@@ -177,6 +186,7 @@ function applyFilters(collection,filteredMonth,filteredSection){
 				})
 				.attr("r", 3)
              .on("mouseover", function(d) {      
+                 d3.select(this).transition().duration(100).attr("r", 10)
             div.transition()        
                 .duration(200)      
                 .style("opacity", .9);      
@@ -184,7 +194,8 @@ function applyFilters(collection,filteredMonth,filteredSection){
                 .style("left", (d3.event.pageX) + "px")     
                 .style("top", (d3.event.pageY - 28) + "px");    
             })                  
-        .on("mouseout", function(d) {       
+        .on("mouseout", function(d) {     
+                 d3.select(this).transition().duration(100).attr("r", 3)
             div.transition()        
                 .duration(500)      
                 .style("opacity", 0);   
@@ -195,14 +206,14 @@ function applyFilters(collection,filteredMonth,filteredSection){
 		map.on("viewreset", update);
 		update();
 
-
+}
 		
 }
 
 function update() {
-            console.log(feature);
-			feature.attr("transform", function(d) { 
-				return "translate("+ 
+    console.log(feature);
+    feature.attr("transform", function(d) { 
+        return "translate("+ 
 					map.latLngToLayerPoint(d.LatLng).x +","+ 
 					map.latLngToLayerPoint(d.LatLng).y +")";
 				}
